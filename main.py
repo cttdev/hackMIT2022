@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import time
 
 import adafruit_scd30
@@ -50,10 +51,10 @@ def sendMessage(messsage):
 scd = adafruit_scd30.SCD30(board.I2C())
 
 def getEnvironmentData():
-    print("Data available?", scd.data_available)
-    print("CO2:", scd.CO2, "PPM")
-    print("Temperature:", scd.temperature, "degrees C")
-    print("Humidity:", scd.relative_humidity, "%%rH")
+    # print("Data available?", scd.data_available)
+    # print("CO2:", scd.CO2, "PPM")
+    # print("Temperature:", scd.temperature, "degrees C")
+    # print("Humidity:", scd.relative_humidity, "%%rH")
     return [scd.CO2, scd.temperature, scd.relative_humidity]
 
 
@@ -124,7 +125,7 @@ humAvg = SlidingAverage(env_start[2],10)
 
 # Initialize the NN
 net = jetson_inference.detectNet("ssd-mobilenet-v2", threshold=DETECTION_THRESHOLD)
-camera = jetson_utils.gstCamera(1920, 1080, "/dev/video1")
+camera = jetson_utils.gstCamera(1920, 1080, "/dev/video0")
 display = jetson_utils.glDisplay()
 lastMessage = 0
 # Main loop
@@ -151,6 +152,6 @@ while display.IsOpen():
 
     # Check if message needs to be sent
     if(num_people > 0 or num_dogs > 0):
-        if(env[0] > CO2_MAX or env[1] > TEMP_MAX) and time.time() - lastMessage > 5:
+        if(env[0] > CO2_MAX or env[1] > TEMP_MAX) and time.time() - lastMessage > 30:
             sendMessage('Warning: Unsafe conditions detected in your vehicle while a living entity is in the car. Please return immediately!')
             lastMessage = time.time()
